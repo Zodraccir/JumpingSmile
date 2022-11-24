@@ -1,11 +1,10 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2022)
-and may not be redistributed without written permission.*/
-
-//Using SDL, SDL_image, standard IO, and strings
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include<SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <string>
+#include <iostream>
+
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
@@ -24,7 +23,7 @@ class Player
 		static const int PLAYER_WIDTH = 64;
 		static const int PLAYER_HEIGHT = 205;
 		
-		//Initializes variables
+		//Initializes variables    
 		Player();
 
 		//Deallocates memory
@@ -56,6 +55,9 @@ class Player
 		
 		void move();
 		void handleEvent( SDL_Event& e );
+
+		//GetNumberOfJumps
+		int getJumps();
 		
 	private:
 		//The actual hardware texture
@@ -72,6 +74,9 @@ class Player
 
 		//The velocity of the player
 		int mVelX,mVelY;
+		
+		//Salti fatti
+		int jumps;
 
 		
 };
@@ -94,8 +99,23 @@ SDL_Renderer* gRenderer = NULL;
 //Loads individual image as texture
 SDL_Texture* loadTexture( std::string path );
 
+//Text Surface
+SDL_Surface* textSurface = NULL;
+
+//Set rendering space and render to screen
+SDL_Rect renderQuad = { 550, 10, 60, 60 };
+
+SDL_Color textColor = { 0, 0, 0, 0xFF };
+
+//Texture for text
+SDL_Texture* textTexture;
+
 //Texture
 SDL_Texture* gTexture = NULL;
+
+//Font
+TTF_Font *gFont = NULL;
+
 
 //Walking animation
 
@@ -112,6 +132,7 @@ Player::Player()
 	frame=0;
 	flipType = SDL_FLIP_NONE;
 	mPosY=WALKING_Y_BASE;
+	jumps=0;
 }
 
 Player::~Player()
@@ -235,6 +256,12 @@ int Player::getHeight()
 	return mHeight;
 }
 
+int Player::getJumps()
+{
+	return jumps;
+}
+
+
 
 void Player::handleEvent( SDL_Event& e )
 {
@@ -247,9 +274,10 @@ void Player::handleEvent( SDL_Event& e )
             case SDLK_LEFT: mVelX -= PLAYER_VEL; break;
             case SDLK_RIGHT: mVelX += PLAYER_VEL; break;
             case SDLK_SPACE:
-            	if(mPosY==WALKING_Y_BASE)
+            	if(mPosY>=WALKING_Y_BASE)
             	{
             		mVelY=PLAYER_VEL;
+					jumps++;
             	}
         }
     }
@@ -283,9 +311,11 @@ void Player::move()
         mPosY-=mVelY;
     //If the dot went too far up or down
     if( ( mPosY < WALKING_Y_BASE-150 ) )
-    	mVelY=-PLAYER_VEL;
-    if( mPosY == WALKING_Y_BASE)
+    	mVelY=-PLAYER_VEL*1.7;
+    if( mPosY >= WALKING_Y_BASE){
     	mVelY=0;
+		mPosY=WALKING_Y_BASE;
+	}
 }
 
 
@@ -339,6 +369,17 @@ bool init()
 					printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
 					success = false;
 				}
+				else
+				{
+					//Initialize SDL_ttf
+					if( TTF_Init() == -1 )
+					{
+						printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
+						success = false;
+					}
+
+				}
+				
 			}
 		}
 	}
@@ -417,6 +458,13 @@ bool loadMedia()
 		success = false;
 	}
 
+	//Open the font
+	gFont = TTF_OpenFont( "assets/lazy.ttf", 28 );
+	if( gFont == NULL )
+	{
+		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+		success = false;
+	}
 	
 	
 	return success;
@@ -427,6 +475,11 @@ void close()
 	//Free loaded images
 	player.free();
 	SDL_DestroyTexture(gTexture);
+
+	//Free Font
+	TTF_CloseFont( gFont );
+	gFont = NULL;
+	
 	//Destroy window	
 	SDL_DestroyRenderer( gRenderer );
 	SDL_DestroyWindow( gWindow );
@@ -465,8 +518,6 @@ int main( int argc, char* args[] )
 
 			//Flip type
 			SDL_RendererFlip flipType = SDL_FLIP_NONE;
-			
-			
 
 			//While application is running
 			while( !quit )
@@ -495,6 +546,29 @@ int main( int argc, char* args[] )
 				//Render texture to screen
 				SDL_RenderCopy( gRenderer, gTexture, NULL, NULL );
 				
+
+				std::string stringa =  std::to_string(player.getJumps());
+				
+				textSurface = TTF_RenderText_Solid( gFont, stringa.c_str(), textColor );
+				if( textSurface != NULL )
+				{
+						//Create texture from surface pixels
+					textTexture = SDL_CreateTextureFromSurface( gRenderer, textSurface );
+					if( textTexture == NULL )
+						{
+							printf( "Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError() );
+					}
+					//Get rid of old surface
+					SDL_FreeSurface( textSurface );
+					}
+				else
+				{
+					printf( "Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError() );
+				}
+
+				//Render to screen
+				SDL_RenderCopyEx( gRenderer, textTexture, NULL , &renderQuad, 0.0, NULL, SDL_FLIP_NONE );
+
 				
 				//Render current frame
 				player.render();
