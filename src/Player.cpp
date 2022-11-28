@@ -10,6 +10,7 @@ Player::Player()
 	flipType = SDL_FLIP_NONE;
 	mPosY=WALKING_Y_BASE;
 	jumps=0;
+	
 }
 
 Player::Player(int startPos)
@@ -23,6 +24,7 @@ Player::Player(int startPos)
 	mPosY=WALKING_Y_BASE;
 	jumps=0;
 	mPosX=startPos;
+
 }
 
 Player::~Player()
@@ -127,7 +129,12 @@ void Player::setAlpha( Uint8 alpha )
 void Player::render(SDL_Renderer* gRenderer)
 {
 	//Set rendering space and render to screen
-	SDL_Rect renderQuad = { mPosX, mPosY , mWidth, mHeight };
+	
+	renderQuad.x=mPosX;
+	renderQuad.y=mPosY;
+	renderQuad.w=mWidth;
+	renderQuad.h=mHeight;
+
 	
 	SDL_Rect* currentClip = &gSpriteClips[ frame / 4 ];
 	
@@ -142,19 +149,20 @@ void Player::render(SDL_Renderer* gRenderer)
 		renderQuad.w = currentClip->w;
 		renderQuad.h = currentClip->h;
 	}
-
 	//Render to screen
 	//SDL_RenderCopy( gRenderer, mTexture, clip, &renderQuad );
 	SDL_RenderCopyEx( gRenderer, mTexture, currentClip, &renderQuad, 0, NULL, flipType );
 	
 	//Go to next frame
-	++frame;
+	if(abs(mVelX)>0)
+		++frame;
 
 	//Cycle animation
 	if( frame / 4 >= WALKING_ANIMATION_FRAMES )
 	{
 		frame = 0;
 	}
+
 }
 
 int Player::getWidth()
@@ -234,4 +242,9 @@ void Player::move()
     	mVelY=0;
 		mPosY=WALKING_Y_BASE;
 	}
+}
+
+SDL_Rect* Player::getRenderGuad()
+{
+	return &renderQuad;
 }

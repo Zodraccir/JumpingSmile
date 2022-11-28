@@ -1,5 +1,5 @@
 #OBJS specifies which files to compile as part of the project
-OBJS = main.cpp src/Player.cpp src/Texture.cpp src/Counter.cpp src/GameEngine.cpp
+OBJS = main.cpp src/Player.cpp src/Texture.cpp src/Counter.cpp src/GameEngine.cpp src/Bullet.cpp
 
 #CC specifies which compiler we're using
 CC = g++

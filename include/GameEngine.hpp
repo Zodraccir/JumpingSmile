@@ -5,39 +5,45 @@
 #include "Player.hpp"
 #include "Texture.hpp"
 #include "Counter.hpp"
+#include "Bullet.hpp"
+
 // wrapper class
 class GameEngine
 {
 	public:
-		//Initializes variables    
-		GameEngine();
+                //Initializes variables    
+                GameEngine();
 
-		//Deallocates memory
-		~GameEngine();
-		
-		//Starts up SDL and creates window
-        bool init();
+                //Deallocates memory
+                ~GameEngine();
+                        
+                //Starts up SDL and creates window
+                bool init();
 
-        //Loads media
-        bool loadMedia();
+                //Loads media
+                bool loadMedia();
 
-        bool loop();
+                bool loop();
 
-        //Frees media and shuts down SDL
-        void close();
+                //Frees media and shuts down SDL
+                void close();
+
+        
 	private:
-        //The window we'll be rendering to
-        SDL_Window* gWindow = NULL;
+                //The window we'll be rendering to
+                SDL_Window* gWindow = NULL;
 
-        //The window renderer
-        SDL_Renderer* gRenderer = NULL;
+                //The window renderer
+                SDL_Renderer* gRenderer = NULL;
 
-        //Font
-        TTF_Font *gFont = NULL;
+                //Font
+                TTF_Font *gFont = NULL;
 
-        Player player;
-        Texture texture;
-        Counter counter;
+                Player* player;
+                Texture texture;
+                Counter counter;
+
+                Bullet* bullet;
 
 		
 };

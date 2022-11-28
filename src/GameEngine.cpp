@@ -1,19 +1,25 @@
 #include "../include/GameEngine.hpp"
+#include <iostream>
 
 GameEngine::GameEngine()
 {
-
+	gWindow=NULL;
+	gRenderer=NULL;
+	bullet = new Bullet(20,30);
+	
 }
 
 GameEngine::~GameEngine()
 {
-
 }
+
 
 bool GameEngine::init()
 {
 	//Initialization flag
 	bool success = true;
+
+	player= new Player(240);
 
 	//Initialize SDL
 	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
@@ -78,8 +84,9 @@ bool GameEngine::init()
 void GameEngine::close()
 {
 	//Free loaded images
-	player.free();
+	player->free();
 	texture.free();
+	bullet->free();
 	//Free Font
 	TTF_CloseFont( gFont );
 	gFont = NULL;
@@ -101,7 +108,7 @@ bool GameEngine::loadMedia()
 	bool success = true;
 
 	//Load sprite sheet texture
-	if( !player.loadFromFile( "assets/foo.png" , gRenderer ) )
+	if( !player->loadFromFile( "assets/foo.png" , gRenderer ) )
 	{
 		printf( "Failed to load walking animation texture!\n" );
 		success = false;
@@ -110,6 +117,13 @@ bool GameEngine::loadMedia()
 	if( !texture.loadFromFile( "assets/background.png" , gRenderer ) )
 	{
 		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+
+	//Load dot texture
+	if( !bullet->loadFromFile( "assets/dot.bmp" , gRenderer ) )
+	{
+		printf( "Failed to load dot texture!\n" );
 		success = false;
 	}
 
@@ -134,15 +148,21 @@ bool GameEngine::loop()
 
 	//Event handler
 	SDL_Event e;
-			
-	//Angle of rotation
-	double degrees = 0;
+	
+	//The dot that will be moving around on the screen
+	Bullet bullet1( 300, 300);
 
-	//Flip type
-	SDL_RendererFlip flipType = SDL_FLIP_NONE;
+			//Set the wall
+			SDL_Rect wall;
+			wall.x = 300;
+			wall.y = 200;
+			wall.w = 1;
+			wall.h = 1;
+
 	//While application is running
 	while( !quit )
-	{
+	{	
+
 		//Handle events on queue
 		while( SDL_PollEvent( &e ) != 0 )
 		{
@@ -153,29 +173,37 @@ bool GameEngine::loop()
 			}
 			
 			//Handle input for the player
-			player.handleEvent( e );
+			player->handleEvent( e );
+			bullet->handleEvent( e );
 		}
+		
+		//Move the player
+		player->move();
 
-				//Move the dot
-		player.move();
-
-
-				//Clear screen
+		
+		//Clear screen
 		SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 		SDL_RenderClear( gRenderer );
-				
-				//Render texture to screen
+
+		
 		texture.render(gRenderer);
+		player->render(gRenderer);
+
+
+		bullet->move( player->getRenderGuad() );
+		//Render texture to screen
+		
+		bullet->render(gRenderer);
+
+		counter.render(gRenderer,gFont, std::to_string(player->getmPosY()));
+
+
+		//Render current frame
+		
 
 			
-		counter.render(gRenderer,gFont, std::to_string(player.getmPosY()));
 
-				//Render current frame
-		player.render(gRenderer);
-
-			
-
-				//Update screen
+		//Update screen
 		SDL_RenderPresent( gRenderer );
 
 				

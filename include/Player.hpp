@@ -51,11 +51,16 @@ class Player
 
         int getmPosX();
         int getmPosY();
+
+		SDL_Rect* getRenderGuad();
+
 		
 	private:
 		//The actual hardware texture
 		SDL_Texture* mTexture;
 		SDL_RendererFlip flipType;
+
+		SDL_Rect renderQuad;
 
 		//frame
 		SDL_Rect gSpriteClips[ WALKING_ANIMATION_FRAMES ];
