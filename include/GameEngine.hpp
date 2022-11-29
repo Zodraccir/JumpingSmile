@@ -28,6 +28,8 @@ class GameEngine
                 //Frees media and shuts down SDL
                 void close();
 
+                bool landingPage();
+
         
 	private:
                 //The window we'll be rendering to
@@ -39,9 +41,13 @@ class GameEngine
                 //Font
                 TTF_Font *gFont = NULL;
 
+                //Event handler
+	            SDL_Event e;
+
                 Player* player;
                 Texture texture;
                 Counter counter;
+                Texture startTexture;
 
                 Bullet* bullet;
 

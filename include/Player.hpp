@@ -54,6 +54,9 @@ class Player
 
 		SDL_Rect* getRenderGuad();
 
+		bool setJumpMusic(Mix_Chunk* sound);
+		Mix_Chunk* getJumpMusic();
+
 		
 	private:
 		//The actual hardware texture
@@ -79,7 +82,7 @@ class Player
 		//Number of Jumps made
 		int jumps;
 
-		
+		Mix_Chunk *jumpSound;		
 };
 
 #endif

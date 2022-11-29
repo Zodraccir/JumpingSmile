@@ -7,6 +7,7 @@ Texture::Texture()
 	mWidth = 0;
 	mHeight = 0;
 	flipType = SDL_FLIP_NONE;
+	gMusic=NULL;
 
 }
 
@@ -61,15 +62,21 @@ bool Texture::loadFromFile( std::string path , SDL_Renderer* gRenderer)
 void Texture::free()
 {
 
+	//Free the music
+	if(gMusic!=NULL)
+		Mix_FreeMusic( gMusic );
+	gMusic = NULL;
+	if(gTexture!=NULL)
+		SDL_DestroyTexture(gTexture);
+	gTexture=NULL;
 }
 
 //Renders texture at given point
 void Texture::render(SDL_Renderer* gRenderer)
 {
 
+    //If music is being played
 	SDL_RenderCopy( gRenderer, gTexture, NULL, NULL );
-
-
 }
 
 //Gets image dimensions
@@ -81,4 +88,19 @@ int Texture::getWidth()
 int Texture::getHeight()
 {
     return mHeight;
+}
+
+Mix_Music* Texture::getMusic()
+{
+	return gMusic;
+}
+
+bool Texture::setMusic(Mix_Music* music)
+{	
+	gMusic= music;
+	if(gMusic == NULL)
+	{
+		return false;
+	}
+	return true;
 }

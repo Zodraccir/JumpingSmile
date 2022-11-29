@@ -10,6 +10,11 @@ Player::Player()
 	flipType = SDL_FLIP_NONE;
 	mPosY=WALKING_Y_BASE;
 	jumps=0;
+	jumpSound=NULL;
+	mPosX=10;
+	mPosY=WALKING_Y_BASE;
+	mVelX=0;
+	mVelY=0;
 	
 }
 
@@ -24,6 +29,10 @@ Player::Player(int startPos)
 	mPosY=WALKING_Y_BASE;
 	jumps=0;
 	mPosX=startPos;
+	mPosY=WALKING_Y_BASE;
+	jumpSound=NULL;
+	mVelX=0;
+	mVelY=0;
 
 }
 
@@ -106,6 +115,10 @@ void Player::free()
 		mHeight = 0;
 		frame= 0;
 	}
+	//Free the music
+	if(jumpSound!=NULL)
+		Mix_FreeChunk( jumpSound );
+	jumpSound=NULL;
 }
 
 void Player::setColor( Uint8 red, Uint8 green, Uint8 blue )
@@ -204,6 +217,7 @@ void Player::handleEvent( SDL_Event& e )
             	{
             		mVelY=PLAYER_VEL;
 					jumps++;
+					Mix_PlayChannel( -1, jumpSound, 0 );
             	}
         }
     }
@@ -233,10 +247,10 @@ void Player::move()
     }
   
   
-    if( mPosY > WALKING_Y_BASE-150  || mPosY < WALKING_Y_BASE)
+    if( mPosY > WALKING_Y_BASE-200  || mPosY < WALKING_Y_BASE)
         mPosY-=mVelY;
     //If the dot went too far up or down
-    if( ( mPosY < WALKING_Y_BASE-150 ) )
+    if( ( mPosY < WALKING_Y_BASE-200 ) )
     	mVelY=-PLAYER_VEL*1.7;
     if( mPosY >= WALKING_Y_BASE){
     	mVelY=0;
@@ -247,4 +261,19 @@ void Player::move()
 SDL_Rect* Player::getRenderGuad()
 {
 	return &renderQuad;
+}
+
+Mix_Chunk* Player::getJumpMusic()
+{
+	return jumpSound;
+}
+
+bool Player::setJumpMusic(Mix_Chunk* sound)
+{	
+	jumpSound = sound;
+	if(jumpSound == NULL)
+	{
+		return false;
+	}
+	return true;
 }

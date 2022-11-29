@@ -3,8 +3,10 @@
 
 int main( int argc, char* args[] )
 {
+	time_t seconds; 
+	time(&seconds); 
+	srand((unsigned int) seconds);
 	//Start up SDL and create window
-
 	GameEngine gameEngine;
 
 	if( !gameEngine.init() )
@@ -20,7 +22,9 @@ int main( int argc, char* args[] )
 		}
 		else
 		{	
-			gameEngine.loop();
+			
+			if(gameEngine.landingPage())
+						gameEngine.loop();
 		}
 	}
 

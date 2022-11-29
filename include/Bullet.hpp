@@ -35,7 +35,7 @@ class Bullet
         void handleEvent( SDL_Event& e );
 
         //Moves the dot and checks collision
-        void move( SDL_Rect* square);
+        int move( SDL_Rect* square);
 
         //Loads image at specified path
         bool loadFromFile( std::string path , SDL_Renderer* gRenderer);
@@ -45,6 +45,11 @@ class Bullet
 
         //Gets collision circle
         Circle& getCollider();
+
+        bool setCrashSound(Mix_Chunk* sound);
+		Mix_Chunk* getCrashSound();
+
+        bool reset();
 
     private:
         //The X and Y offsets of the dot
@@ -66,6 +71,8 @@ class Bullet
         SDL_Texture* bTexture;
         
         SDL_Surface* loadedSurface;
+
+        Mix_Chunk *crashSound;
 };
 
 

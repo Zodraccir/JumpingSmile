@@ -5,7 +5,7 @@ GameEngine::GameEngine()
 {
 	gWindow=NULL;
 	gRenderer=NULL;
-	bullet = new Bullet(20,30);
+	bullet = new Bullet();
 	
 }
 
@@ -22,7 +22,7 @@ bool GameEngine::init()
 	player= new Player(240);
 
 	//Initialize SDL
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 )
 	{
 		printf( "SDL could not initialize! SDL Error: %s\n", SDL_GetError() );
 		success = false;
@@ -72,6 +72,13 @@ bool GameEngine::init()
 						success = false;
 					}
 
+					//Initialize SDL_mixer
+					if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+					{
+						printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
+						success = false;
+					}
+
 				}
 				
 			}
@@ -90,6 +97,7 @@ void GameEngine::close()
 	//Free Font
 	TTF_CloseFont( gFont );
 	gFont = NULL;
+	
 	
 	//Destroy window	
 	SDL_DestroyRenderer( gRenderer );
@@ -113,12 +121,37 @@ bool GameEngine::loadMedia()
 		printf( "Failed to load walking animation texture!\n" );
 		success = false;
 	}
+	if( player->setJumpMusic(Mix_LoadWAV( "assets/jump.wav" )) == NULL )
+	{
+		printf( "Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
+		success = false;
+	}
 
 	if( !texture.loadFromFile( "assets/background.png" , gRenderer ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load background texture!\n" );
 		success = false;
 	}
+
+	if( texture.setMusic(Mix_LoadMUS( "assets/musicLoop.wav" )) == NULL )
+	{
+		printf( "Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError() );
+		success = false;
+	}
+	
+
+	if( !startTexture.loadFromFile( "assets/prompt.png" , gRenderer ) )
+	{
+		printf( "Failed to load starting texture!\n" );
+		success = false;
+	}
+
+	if( startTexture.setMusic(Mix_LoadMUS( "assets/landingMusic.wav" )) == NULL )
+	{
+		printf( "Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError() );
+		success = false;
+	}
+
 
 	//Load dot texture
 	if( !bullet->loadFromFile( "assets/dot.bmp" , gRenderer ) )
@@ -127,6 +160,11 @@ bool GameEngine::loadMedia()
 		success = false;
 	}
 
+	if( bullet->setCrashSound(Mix_LoadWAV( "assets/crash.wav" )) == NULL )
+	{
+		printf( "Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
+		success = false;
+	}
 
 	//Open the font
 	gFont = TTF_OpenFont( "assets/lazy.ttf", 28 );
@@ -140,24 +178,63 @@ bool GameEngine::loadMedia()
 	return success;
 }
 
+bool GameEngine::landingPage()
+{
+	bool quit=false;
+
+	//If there is no music playing
+	if( Mix_PlayingMusic() == 0 )
+	{
+		//Play the music
+		Mix_PlayMusic( startTexture.getMusic(), -1 );
+	}
+
+
+	while( !quit )
+	{
+		while(SDL_PollEvent ( &e) !=0 )
+		{
+			if(e.type==SDL_QUIT)
+			{
+				return false;
+			}
+			if(e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE)
+			{
+				//If there is no music playing
+				if( Mix_PlayingMusic() != 0 )
+				{
+					//Play the music
+					Mix_HaltMusic();
+				}
+				return true;
+			}
+		}
+		//Clear screen
+		SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+		SDL_RenderClear( gRenderer );
+
+		startTexture.render(gRenderer);
+		
+
+		//Update screen
+		SDL_RenderPresent( gRenderer );
+
+	}
+	startTexture.free();
+}
 
 bool GameEngine::loop()
 {
     //Main loop flag
 	bool quit = false;
+	int score=0;
+	//If there is no music playing
+	if( Mix_PlayingMusic() == 0 )
+	{
+		//Play the music
+		Mix_PlayMusic( texture.getMusic(), -1 );
+	}
 
-	//Event handler
-	SDL_Event e;
-	
-	//The dot that will be moving around on the screen
-	Bullet bullet1( 300, 300);
-
-			//Set the wall
-			SDL_Rect wall;
-			wall.x = 300;
-			wall.y = 200;
-			wall.w = 1;
-			wall.h = 1;
 
 	//While application is running
 	while( !quit )
@@ -174,7 +251,7 @@ bool GameEngine::loop()
 			
 			//Handle input for the player
 			player->handleEvent( e );
-			bullet->handleEvent( e );
+			//bullet->handleEvent( e );
 		}
 		
 		//Move the player
@@ -189,20 +266,24 @@ bool GameEngine::loop()
 		texture.render(gRenderer);
 		player->render(gRenderer);
 
-
-		bullet->move( player->getRenderGuad() );
-		//Render texture to screen
+		int bulletMoveOutput=bullet->move( player->getRenderGuad() );
 		
-		bullet->render(gRenderer);
-
-		counter.render(gRenderer,gFont, std::to_string(player->getmPosY()));
-
-
-		//Render current frame
+		switch (bullet->move( player->getRenderGuad() ))
+		{
+		case 0:
+			bullet->render(gRenderer);
+			break;
+		case -1:
+			score++;
+		case 1:
+		default:
+			bullet->reset();
+		}
 		
 
-			
+		counter.render(gRenderer,gFont, std::to_string(score));
 
+		
 		//Update screen
 		SDL_RenderPresent( gRenderer );
 

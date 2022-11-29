@@ -26,11 +26,16 @@ class Texture
 		int getWidth();
 		int getHeight();
 
-		
+		bool setMusic(Mix_Music* music);
+		Mix_Music* getMusic();
+
 	private:
 		//The actual hardware texture
 		SDL_Texture* gTexture;
 		SDL_RendererFlip flipType;
+
+		//Music associate with texturebackground
+		Mix_Music *gMusic;
 
 		//Image dimensions
 		int mWidth;

@@ -69,38 +69,34 @@ bool checkCollision( Circle& a, Circle& b )
     return false;
 }
 
-Bullet::Bullet( int x, int y )
-{
-    //Initialize the offsets
-    mPosX = x;
-    mPosY = y;
+// Bullet::Bullet( int x, int y )
+// {
+//     //Initialize the offsets
+//     mPosX = x;
+//     mPosY = y;
 
-	//Set collision circle size
-	mCollider.r = DOT_WIDTH / 2;
+// 	//Set collision circle size
+// 	mCollider.r = DOT_WIDTH / 2;
 
-    //Initialize the velocity
-    mVelX = 0;
-    mVelY = 0;
+//     //Initialize the velocity
+//     mVelX = 0;
+//     mVelY = 0;
 
-	//Move collider relative to the circle
-	shiftColliders();
-}
+// 	//Move collider relative to the circle
+// 	shiftColliders();
+//     crashSound=NULL;
+// }
 
 Bullet::Bullet()
 {
-    //Initialize the offsets
-    mPosX = 30;
-    mPosY = 30;
+    
 
 	//Set collision circle size
 	mCollider.r = DOT_WIDTH / 2;
 
-    //Initialize the velocity
-    mVelX = 0;
-    mVelY = 0;
+    reset();
+    crashSound=NULL;
 
-	//Move collider relative to the circle
-	shiftColliders();
 }
 
 Bullet::~Bullet()
@@ -108,25 +104,68 @@ Bullet::~Bullet()
     free();
 }
 
-void Bullet::free()
+bool Bullet::reset()
 {
+    //Initialize the offsets
+    //mPosX = mCollider.r;
+    mPosY = mCollider.r + rand()%(200 + 1) + 0;
 
+    if( 0 + (rand() % (1 - 0 + 1)) == 1)
+    {
+        mPosX=mCollider.r;
+        mVelX=DOT_VEL;
+    }
+    else
+    {
+        mPosX=SCREEN_WIDTH-mCollider.r;
+        mVelX=-DOT_VEL;
+    }
+
+    //Initialize the velocity
+    //mVelX = 0;
+    mVelY = 0;
+
+	//Move collider relative to the circle
+	shiftColliders();
+    return true;
+}
+
+void Bullet::free()
+{   
+
+    //Free the music
+	if(crashSound!=NULL)
+		Mix_FreeChunk( crashSound );
+	crashSound=NULL;
+    if(bTexture!=NULL)
+        SDL_DestroyTexture(bTexture);
+    bTexture=NULL;
 }
 
 
-void Bullet::move( SDL_Rect* square)
+int Bullet::move( SDL_Rect* square)
 {
     //Move the dot left or right
     mPosX += mVelX;
 	shiftColliders();
 
-    //If the dot collided or went too far to the left or right
-	if( ( mPosX - mCollider.r < 0 ) || ( mPosX + mCollider.r > SCREEN_WIDTH ) || checkCollision( mCollider, square ) )
+    //If the dot went too far to the left or right
+	if( ( mPosX - mCollider.r < 0 ) || ( mPosX + mCollider.r > SCREEN_WIDTH ))
     {
         //Move back
         mPosX -= mVelX;
 		shiftColliders();
+        return 1;
     }
+    
+    //If the dot collided with the square
+    if( checkCollision( mCollider, square ) )
+    {
+        Mix_PlayChannel( -1, crashSound, 0 );
+        return -1;
+    }
+
+    return 0;
 
     //Move the dot up or down
     mPosY += mVelY;
@@ -226,4 +265,19 @@ void Bullet::handleEvent( SDL_Event& e )
             case SDLK_d: mVelX -= DOT_VEL; break;
         }
     }
+}
+
+Mix_Chunk* Bullet::getCrashSound()
+{
+	return crashSound;
+}
+
+bool Bullet::setCrashSound(Mix_Chunk* sound)
+{	
+	crashSound = sound;
+	if(crashSound == NULL)
+	{
+		return false;
+	}
+	return true;
 }
