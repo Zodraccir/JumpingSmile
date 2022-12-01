@@ -57,6 +57,10 @@ class Player
 		bool setJumpMusic(Mix_Chunk* sound);
 		Mix_Chunk* getJumpMusic();
 
+		bool isNotJumping();
+
+		std::string toString();
+
 		
 	private:
 		//The actual hardware texture
@@ -68,10 +72,16 @@ class Player
 		//frame
 		SDL_Rect gSpriteClips[ WALKING_ANIMATION_FRAMES ];
 
+		//frame
+		SDL_Rect gSpriteClipsWhileJump[ WALKING_ANIMATION_FRAMES ];
+
 		//Image dimensions
 		int mWidth;
 		int mHeight;
 		int frame;
+
+		//base y walking
+		int WALKING_Y_BASE;
 		
 		//The position of the player
 		int mPosX,mPosY;
@@ -81,6 +91,11 @@ class Player
 		
 		//Number of Jumps made
 		int jumps;
+
+		//If the player is lowere to the ground
+		int lowered;
+
+		int maxJump;
 
 		Mix_Chunk *jumpSound;		
 };

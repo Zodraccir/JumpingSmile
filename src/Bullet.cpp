@@ -108,7 +108,7 @@ bool Bullet::reset()
 {
     //Initialize the offsets
     //mPosX = mCollider.r;
-    mPosY = mCollider.r + rand()%(200 + 1) + 0;
+    mPosY = mCollider.r + rand()%(SCREEN_HEIGHT-(SCREEN_HEIGHT * (2/3))  -   + 1) + (SCREEN_HEIGHT * (2/3));
 
     if( 0 + (rand() % (1 - 0 + 1)) == 1)
     {

@@ -45,11 +45,12 @@ class GameEngine
 	            SDL_Event e;
 
                 Player* player;
+               
                 Texture texture;
                 Counter counter;
                 Texture startTexture;
 
-                Bullet* bullet;
+                Bullet bullet[5];
 
 		
 };

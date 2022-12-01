@@ -9,10 +9,9 @@
 #include <stdio.h>
 #include <iostream>
 //Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 720;
 static const int WALKING_ANIMATION_FRAMES = 4;
 
-const int WALKING_Y_BASE = ( SCREEN_HEIGHT ) / 2;
 
 #endif

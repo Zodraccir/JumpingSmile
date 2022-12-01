@@ -4,7 +4,7 @@
 Counter::Counter()
 {
   
-    renderQuad = { 550, 10, 60, 60 };
+    renderQuad = { SCREEN_WIDTH - 70, 10, 60, 60 };
     textColor = { 0, 0, 0, 0xFF };
     textTexture = NULL;
     textSurface = NULL;

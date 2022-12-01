@@ -5,7 +5,10 @@ GameEngine::GameEngine()
 {
 	gWindow=NULL;
 	gRenderer=NULL;
-	bullet = new Bullet();
+	// for(int i=0;i<5;i++)
+	// {
+	// 	bullet[i]=new Bullet();
+	// }
 	
 }
 
@@ -93,7 +96,11 @@ void GameEngine::close()
 	//Free loaded images
 	player->free();
 	texture.free();
-	bullet->free();
+	//bullet->free();
+	for(int i=0;i<5;i++)
+	{
+		bullet[i].free();
+	}
 	//Free Font
 	TTF_CloseFont( gFont );
 	gFont = NULL;
@@ -116,7 +123,7 @@ bool GameEngine::loadMedia()
 	bool success = true;
 
 	//Load sprite sheet texture
-	if( !player->loadFromFile( "assets/foo.png" , gRenderer ) )
+	if( !player->loadFromFile( "assets/player.png" , gRenderer ) )
 	{
 		printf( "Failed to load walking animation texture!\n" );
 		success = false;
@@ -152,19 +159,34 @@ bool GameEngine::loadMedia()
 		success = false;
 	}
 
-
-	//Load dot texture
-	if( !bullet->loadFromFile( "assets/dot.bmp" , gRenderer ) )
+	for(int i=0;i<5;i++)
 	{
-		printf( "Failed to load dot texture!\n" );
-		success = false;
+		//Load dot texture
+		if( !bullet[i].loadFromFile( "assets/dot.bmp" , gRenderer ) )
+		{
+			printf( "Failed to load dot texture!\n" );
+			success = false;
+		}
+
+		if( bullet[i].setCrashSound(Mix_LoadWAV( "assets/crash.wav" )) == NULL )
+		{
+			printf( "Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
+			success = false;
+		}
 	}
 
-	if( bullet->setCrashSound(Mix_LoadWAV( "assets/crash.wav" )) == NULL )
-	{
-		printf( "Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
-		success = false;
-	}
+	// //Load dot texture
+	// if( !bullet->loadFromFile( "assets/dot.bmp" , gRenderer ) )
+	// {
+	// 	printf( "Failed to load dot texture!\n" );
+	// 	success = false;
+	// }
+
+	// if( bullet->setCrashSound(Mix_LoadWAV( "assets/crash.wav" )) == NULL )
+	// {
+	// 	printf( "Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
+	// 	success = false;
+	// }
 
 	//Open the font
 	gFont = TTF_OpenFont( "assets/lazy.ttf", 28 );
@@ -257,6 +279,7 @@ bool GameEngine::loop()
 		//Move the player
 		player->move();
 
+		std::cout<<player->toString()<<std::endl;
 		
 		//Clear screen
 		SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
@@ -265,20 +288,36 @@ bool GameEngine::loop()
 		
 		texture.render(gRenderer);
 		player->render(gRenderer);
-
-		int bulletMoveOutput=bullet->move( player->getRenderGuad() );
 		
-		switch (bullet->move( player->getRenderGuad() ))
+		
+		for(int i=0;i<5;i++)
 		{
-		case 0:
-			bullet->render(gRenderer);
-			break;
-		case -1:
-			score++;
-		case 1:
-		default:
-			bullet->reset();
+			
+			switch (bullet[i].move( player->getRenderGuad() ))
+			{
+			case 0:
+				bullet[i].render(gRenderer);
+				break;
+			case -1:
+				score++;
+			case 1:
+			default:
+				bullet[i].reset();
+			}
 		}
+	
+		
+		// switch (bullet->move( player->getRenderGuad() ))
+		// {
+		// case 0:
+		// 	bullet->render(gRenderer);
+		// 	break;
+		// case -1:
+		// 	score++;
+		// case 1:
+		// default:
+		// 	bullet->reset();
+		// }
 		
 
 		counter.render(gRenderer,gFont, std::to_string(score));
