@@ -262,7 +262,7 @@ void Player::handleEvent( SDL_Event& e )
             case SDLK_SPACE:
 				if(isNotJumping())
 				{
-            		mVelY=PLAYER_VEL;
+            		mVelY=30;
 					jumps++;
 					Mix_PlayChannel( -1, jumpSound, 0 );
 				}
@@ -309,6 +309,20 @@ void Player::move()
         mPosX -= mVelX;
     }
   
+	
+	mPosY-=mVelY;
+	
+	if(mPosY>WALKING_Y_BASE || isNotJumping() )
+	{
+		mPosY=WALKING_Y_BASE;
+		mVelY=0;
+	}
+	else
+	{
+		mVelY-=1;
+	}
+
+	/*
 	if(abs(mVelY)>0)
 	{	
 		
@@ -323,7 +337,7 @@ void Player::move()
 			}
 			mPosY-=mVelY;
 	}
-
+	*/
 
 }
 
