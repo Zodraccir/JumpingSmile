@@ -2,6 +2,7 @@
 #define PLAYER
 
 #include "common.hpp"
+#include "Fist.hpp"
 
 // wrapper class
 class Player
@@ -21,7 +22,7 @@ class Player
 		~Player();
 
 		//Loads image at specified path
-        bool loadFromFile( std::string path , SDL_Renderer* gRenderer);
+        bool loadFromFile( std::string path , std::string pathFist , SDL_Renderer* gRenderer);
 		
         //Deallocates texture
 		void free();
@@ -53,6 +54,7 @@ class Player
         int getmPosY();
 
 		SDL_Rect* getRenderGuad();
+		SDL_Rect* getRenderGuadFist();
 
 		bool setJumpMusic(Mix_Chunk* sound);
 		Mix_Chunk* getJumpMusic();
@@ -97,7 +99,9 @@ class Player
 
 		int maxJump;
 
-		Mix_Chunk *jumpSound;		
+		Mix_Chunk *jumpSound;
+
+		Fist* fist;
 };
 
 #endif

@@ -3,6 +3,7 @@
 
 #include "common.hpp"
 
+
 // wrapper class
 class Fist
 {
@@ -28,7 +29,7 @@ class Fist
 		int getWidth();
 		int getHeight();
 		
-		void move();
+		void move(int mPosX,int mPosY, SDL_RendererFlip flipType);
 
         int getmPosX();
         int getmPosY();
@@ -40,10 +41,12 @@ class Fist
 
 		std::string toString();
 
+        bool loadFromFile( std::string path , SDL_Renderer* gRenderer);
+
 		
 	private:
 		//The actual hardware texture
-		SDL_Texture* mTexture;
+		SDL_Texture* fTexture;
 		SDL_RendererFlip flipType;
 
 		SDL_Rect renderQuad;
@@ -59,10 +62,12 @@ class Fist
 		//The velocity of the fist
 		int mVelX,mVelY;
 		
-		Mix_Chunk *jumpSound;
+		Mix_Chunk *fistSound;
         
         static const int PLAYER_WIDTH = 64;
 		static const int PLAYER_HEIGHT = 205;
+
+		
 };
 
 #endif

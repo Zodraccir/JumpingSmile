@@ -123,7 +123,7 @@ bool GameEngine::loadMedia()
 	bool success = true;
 
 	//Load sprite sheet texture
-	if( !player->loadFromFile( "assets/player.png" , gRenderer ) )
+	if( !player->loadFromFile( "assets/player.png" , "assets/black.png" , gRenderer ) )
 	{
 		printf( "Failed to load walking animation texture!\n" );
 		success = false;
@@ -293,7 +293,7 @@ bool GameEngine::loop()
 		for(int i=0;i<5;i++)
 		{
 			
-			switch (bullet[i].move( player->getRenderGuad() ))
+			switch (bullet[i].move( player->getRenderGuadFist() ))
 			{
 			case 0:
 				bullet[i].render(gRenderer);

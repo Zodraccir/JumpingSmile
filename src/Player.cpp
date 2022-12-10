@@ -22,8 +22,11 @@ Player::Player()
 
 	maxJump=WALKING_Y_BASE- (( SCREEN_HEIGHT ) / 3);
 
+	fist=new Fist(mPosX+mWidth,mPosY-(mHeight/2));
+
 	
 	lowered=false;
+
 }
 
 Player::Player(int startPos)
@@ -46,8 +49,11 @@ Player::Player(int startPos)
 	mVelY=0;
 	
 	maxJump=WALKING_Y_BASE- (( SCREEN_HEIGHT ) / 3);
+
 	
 	lowered=false;
+
+	fist=new Fist(mPosX+mWidth,mPosY-(mHeight/2));
 }
 
 Player::~Player()
@@ -56,7 +62,7 @@ Player::~Player()
 	free();
 }
 
-bool Player::loadFromFile( std::string path , SDL_Renderer* gRenderer)
+bool Player::loadFromFile( std::string path , std::string pathFist , SDL_Renderer* gRenderer)
 {
 	//Get rid of preexisting texture
 	free();
@@ -138,6 +144,11 @@ bool Player::loadFromFile( std::string path , SDL_Renderer* gRenderer)
 	gSpriteClipsWhileJump[ 3 ].w = PLAYER_WIDTH;
 	gSpriteClipsWhileJump[ 3 ].h = PLAYER_HEIGHT/2;
 
+	if(fist!= NULL)
+	{
+		fist->loadFromFile(pathFist , gRenderer);
+	}
+
 
 	return mTexture != NULL;
 }
@@ -198,11 +209,6 @@ void Player::render(SDL_Renderer* gRenderer)
 		currentClip = &gSpriteClips[ frame / 4 ];
 	}
 	
-	if(mVelX<0)
-		flipType = SDL_FLIP_NONE;
-	else if(mVelX>0)
-		flipType = SDL_FLIP_HORIZONTAL;
-	
 	//Set clip rendering dimensions
 	if( currentClip != NULL )
 	{
@@ -221,6 +227,12 @@ void Player::render(SDL_Renderer* gRenderer)
 	if( frame / 4 >= WALKING_ANIMATION_FRAMES )
 	{
 		frame = 0;
+	}
+
+	if(fist != NULL)
+	{
+		fist->toString();
+		fist->render(gRenderer); 
 	}
 
 }
@@ -322,6 +334,20 @@ void Player::move()
 		mVelY-=1;
 	}
 
+	if(mVelX<0)
+		flipType = SDL_FLIP_NONE;
+	else if(mVelX>0)
+		flipType = SDL_FLIP_HORIZONTAL;
+
+	if(fist != NULL)
+	{
+		if(flipType==SDL_FLIP_HORIZONTAL)
+			fist->move(mPosX+PLAYER_WIDTH,mPosY+(PLAYER_HEIGHT/2),flipType);
+		else if(flipType==SDL_FLIP_NONE)
+			fist->move(mPosX-30,mPosY+(PLAYER_HEIGHT/2),flipType);
+	}
+
+
 	/*
 	if(abs(mVelY)>0)
 	{	
@@ -345,6 +371,11 @@ SDL_Rect* Player::getRenderGuad()
 {
 	return &renderQuad;
 }
+
+SDL_Rect* Player::getRenderGuadFist()
+{
+	return fist->getRenderGuad();
+} 
 
 Mix_Chunk* Player::getJumpMusic()
 {
@@ -375,5 +406,5 @@ bool Player::isNotJumping()
 
 std::string Player::toString()
 {
-	return std::to_string(mPosX)+"/"+std::to_string(mPosY)+"/"+std::to_string(mVelX)+"/"+std::to_string(mVelY)+"/"+std::to_string(lowered);
+	return std::to_string(mPosX)+"/"+std::to_string(mPosY)+"/"+std::to_string(mVelX)+"/"+std::to_string(mVelY)+"/"+std::to_string(lowered)+" :Player1";
 }
