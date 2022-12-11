@@ -63,6 +63,8 @@ class Player
 
 		std::string toString();
 
+		bool rockHitted(int valueRock);
+
 		
 	private:
 		//The actual hardware texture

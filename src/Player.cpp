@@ -200,7 +200,7 @@ void Player::render(SDL_Renderer* gRenderer)
 	
 	SDL_Rect* currentClip = NULL;
 
-	if(abs(mVelY)>0 || lowered==true)
+	if(abs(mVelY)>0)
 	{
 		currentClip = &gSpriteClipsWhileJump[ frame / 4 ];
 	}
@@ -215,6 +215,11 @@ void Player::render(SDL_Renderer* gRenderer)
 		renderQuad.w = currentClip->w;
 		renderQuad.h = currentClip->h;
 	}
+
+	if(mVelX<0)
+		flipType = SDL_FLIP_NONE;
+	else if(mVelX>0)
+		flipType = SDL_FLIP_HORIZONTAL;
 	//Render to screen
 	//SDL_RenderCopy( gRenderer, mTexture, clip, &renderQuad );
 	SDL_RenderCopyEx( gRenderer, mTexture, currentClip, &renderQuad, 0, NULL, flipType );
@@ -280,19 +285,9 @@ void Player::handleEvent( SDL_Event& e )
 				}
 				break;
 			case SDLK_LCTRL:
-			
-            	if(isNotJumping())
-            	{
-            		lowered=true;
-					mPosY=mPosY+Player::PLAYER_HEIGHT/2;
-            	}
-				else if (lowered==true)
-				{
-					lowered=false;
-					mPosY=mPosY-Player::PLAYER_HEIGHT/2;
-				}
-				break;
 				
+				fist->punch();
+				break;
 				
         }
     }
@@ -334,17 +329,13 @@ void Player::move()
 		mVelY-=1;
 	}
 
-	if(mVelX<0)
-		flipType = SDL_FLIP_NONE;
-	else if(mVelX>0)
-		flipType = SDL_FLIP_HORIZONTAL;
+	
 
 	if(fist != NULL)
 	{
-		if(flipType==SDL_FLIP_HORIZONTAL)
-			fist->move(mPosX+PLAYER_WIDTH,mPosY+(PLAYER_HEIGHT/2),flipType);
-		else if(flipType==SDL_FLIP_NONE)
-			fist->move(mPosX-30,mPosY+(PLAYER_HEIGHT/2),flipType);
+		
+			fist->move(mPosX,mPosY,flipType);
+		
 	}
 
 
@@ -407,4 +398,9 @@ bool Player::isNotJumping()
 std::string Player::toString()
 {
 	return std::to_string(mPosX)+"/"+std::to_string(mPosY)+"/"+std::to_string(mVelX)+"/"+std::to_string(mVelY)+"/"+std::to_string(lowered)+" :Player1";
+}
+
+bool Player::rockHitted(int valueRock)
+{
+	fist->rockHitted(valueRock);
 }

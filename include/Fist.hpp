@@ -34,6 +34,8 @@ class Fist
         int getmPosX();
         int getmPosY();
 
+		bool punch();
+
 		SDL_Rect* getRenderGuad();
 
 		bool setFistChuck(Mix_Chunk* sound);
@@ -42,6 +44,8 @@ class Fist
 		std::string toString();
 
         bool loadFromFile( std::string path , SDL_Renderer* gRenderer);
+
+		bool rockHitted(int valueRock);
 
 		
 	private:
@@ -67,7 +71,9 @@ class Fist
         static const int PLAYER_WIDTH = 64;
 		static const int PLAYER_HEIGHT = 205;
 
-		
+		//Added Distance after punch
+		int mAddedX,mAddedY;
+
 };
 
 #endif

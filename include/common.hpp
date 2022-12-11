@@ -12,6 +12,8 @@
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 static const int WALKING_ANIMATION_FRAMES = 4;
-
+static const int PLAYER_WIDTH = 64;
+static const int PLAYER_HEIGHT = 205;
+static const int PLAYER_VEL = 10;
 
 #endif

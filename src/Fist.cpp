@@ -7,8 +7,8 @@ Fist::Fist(int x,int y)
 	
     //Initialize
 	fTexture = NULL;
-	mWidth = 30;
-	mHeight = 30;
+	mWidth = 120;
+	mHeight = 120;
 	flipType = SDL_FLIP_NONE;
 	fistSound=NULL;
 
@@ -16,7 +16,8 @@ Fist::Fist(int x,int y)
 	mPosX=y;
 	mVelX=0;
 	mVelY=0;
-
+	mAddedX=0;
+	mAddedY=0;
 
 }
 
@@ -51,10 +52,10 @@ void Fist::render(SDL_Renderer* gRenderer)
 	renderQuad.y=mPosY;
 	renderQuad.w=mWidth;
 	renderQuad.h=mHeight;
-	//Render to screen
+	
+		
 
-
-	SDL_RenderCopyEx( gRenderer, fTexture, NULL, &renderQuad, 0, NULL, SDL_FLIP_NONE );
+	SDL_RenderCopyEx( gRenderer, fTexture, NULL, &renderQuad, 0, NULL, flipType );
 
 }
 
@@ -87,8 +88,8 @@ bool Fist::loadFromFile( std::string path , SDL_Renderer* gRenderer)
 		else
 		{
 			//Get image dimensions
-			mWidth = loadedSurface->w;
-			mHeight = loadedSurface->h;
+			// mWidth = loadedSurface->w;
+			// mHeight = loadedSurface->h;
 		}
 
 		//Get rid of old loaded surface
@@ -101,13 +102,32 @@ bool Fist::loadFromFile( std::string path , SDL_Renderer* gRenderer)
 }
 
 
-void Fist::move(int x,int y, SDL_RendererFlip fliptype)
+void Fist::move(int x,int y, SDL_RendererFlip type)
 {
     //Move the dot left or right mPosX+mWidth,mPosY-(mHeight/2)
     mPosX = x;
-    mPosY = y;
-    //std::cout<<std::to_string(mPosX)+"/"+std::to_string(mPosY)+"/"+std::to_string(mVelX)+"/"+std::to_string(mVelY)+"/"+std::to_string(mHeight)+" :Fist"<<std::endl;
-	flipType=flipType;
+    mPosY = y + PLAYER_HEIGHT/2;
+
+	mAddedX+=mVelX;
+	
+	if(mAddedX<=0)
+	{
+		mAddedX=0;
+		mVelX=0;
+	}
+	else
+	{
+		mVelX-=1;
+	}
+	
+	//Render to screen
+	if(flipType==SDL_FLIP_NONE)
+		mPosX=mPosX-(mWidth-PLAYER_WIDTH/2+mAddedX);
+	else
+		mPosX=mPosX+PLAYER_WIDTH/2+mAddedX;
+
+    std::cout<<std::to_string(mPosX)+"/"+std::to_string(mPosY)+"/"+std::to_string(mVelX)+"/"+std::to_string(mVelY)+"/"+std::to_string(mAddedX)+" :Fist"<<std::endl;
+	flipType=type;
 }
 
 std::string Fist::toString()
@@ -119,4 +139,25 @@ std::string Fist::toString()
 SDL_Rect* Fist::getRenderGuad()
 {
 	return &renderQuad;
+}
+
+bool Fist::punch()
+{
+	mVelX=PLAYER_VEL;
+	std::cout<<"pugnoo"<<std::endl;
+}
+
+bool Fist::rockHitted(int valueRock)
+{
+
+	if(mWidth<=30){
+		mWidth=30;
+		mHeight=30;
+	}
+	else
+	{
+		mWidth-=valueRock;
+		mHeight-=valueRock;
+	}
+
 }

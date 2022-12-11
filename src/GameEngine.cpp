@@ -299,6 +299,7 @@ bool GameEngine::loop()
 				bullet[i].render(gRenderer);
 				break;
 			case -1:
+				player->rockHitted(1);
 				score++;
 			case 1:
 			default:
