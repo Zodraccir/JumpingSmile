@@ -89,11 +89,6 @@ bool checkCollision( Circle& a, Circle& b )
 
 Bullet::Bullet()
 {
-    
-
-	//Set collision circle size
-	mCollider.r = DOT_WIDTH / 2;
-
     reset();
     crashSound=NULL;
 
@@ -108,22 +103,31 @@ bool Bullet::reset()
 {
     //Initialize the offsets
     //mPosX = mCollider.r;
+
+    typeBullet=((rand()%5) + 1);
+    dotWidht= typeBullet*10;
+
+    mCollider.r = dotWidht / 2;
     mPosY = mCollider.r + rand()%(SCREEN_HEIGHT-(SCREEN_HEIGHT * (2/3))  -   + 1) + (SCREEN_HEIGHT * (2/3));
 
     if( 0 + (rand() % (1 - 0 + 1)) == 1)
     {
         mPosX=mCollider.r;
-        mVelX=DOT_VEL;
+        mVelX=6-typeBullet;
     }
     else
     {
         mPosX=SCREEN_WIDTH-mCollider.r;
-        mVelX=-DOT_VEL;
+        mVelX=-(6-typeBullet);
     }
 
     //Initialize the velocity
     //mVelX = 0;
     mVelY = 0;
+
+
+    std::cout<<std::to_string(dotWidht)+"/"+std::to_string(mCollider.r)+"/"+std::to_string(typeBullet)<<std::endl;
+
 
 	//Move collider relative to the circle
 	shiftColliders();
@@ -162,7 +166,7 @@ int Bullet::move( SDL_Rect* square)
     if( checkCollision( mCollider, square ) )
     {
         Mix_PlayChannel( -1, crashSound, 0 );
-        return -1;
+        return -typeBullet;
     }
 
     return 0;
@@ -219,7 +223,7 @@ bool Bullet::loadFromFile( std::string path , SDL_Renderer* gRenderer)
 
 void Bullet::render(SDL_Renderer* gRenderer)
 {
-    SDL_Rect renderQuad = { mPosX - mCollider.r, mPosY - mCollider.r, DOT_WIDTH, DOT_HEIGHT };
+    SDL_Rect renderQuad = { mPosX - mCollider.r, mPosY - mCollider.r, dotWidht, dotWidht };
 
 	//Render to screen
 	SDL_RenderCopyEx( gRenderer, bTexture, NULL, &renderQuad, 0, NULL, SDL_FLIP_NONE );
@@ -238,34 +242,6 @@ void Bullet::shiftColliders()
 	mCollider.y = mPosY;
 }
 
-
-void Bullet::handleEvent( SDL_Event& e )
-{
-    //If a key was pressed
-	if( e.type == SDL_KEYDOWN && e.key.repeat == 0 )
-    {
-        //Adjust the velocity
-        switch( e.key.keysym.sym )
-        {
-            case SDLK_w: mVelY -= DOT_VEL; break;
-            case SDLK_s: mVelY += DOT_VEL; break;
-            case SDLK_a: mVelX -= DOT_VEL; break;
-            case SDLK_d: mVelX += DOT_VEL; break;
-        }
-    }
-    //If a key was released
-    else if( e.type == SDL_KEYUP && e.key.repeat == 0 )
-    {
-        //Adjust the velocity
-        switch( e.key.keysym.sym )
-        {
-            case SDLK_w: mVelY += DOT_VEL; break;
-            case SDLK_s: mVelY -= DOT_VEL; break;
-            case SDLK_a: mVelX += DOT_VEL; break;
-            case SDLK_d: mVelX -= DOT_VEL; break;
-        }
-    }
-}
 
 Mix_Chunk* Bullet::getCrashSound()
 {

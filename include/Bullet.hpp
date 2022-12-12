@@ -14,12 +14,9 @@ struct Circle
 class Bullet
 {
     public:
-        //The dimensions of the dot
-        static const int DOT_WIDTH = 20;
-        static const int DOT_HEIGHT = 20;
 
-        //Maximum axis velocity of the dot
-        static const int DOT_VEL = 1;
+        // //Maximum axis velocity of the dot
+        // static const int DOT_VEL = 1;
 
         Bullet();
 
@@ -73,6 +70,10 @@ class Bullet
         SDL_Surface* loadedSurface;
 
         Mix_Chunk *crashSound;
+        
+        int typeBullet;
+
+        int dotWidht;
 };
 
 

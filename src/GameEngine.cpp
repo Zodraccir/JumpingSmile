@@ -279,7 +279,7 @@ bool GameEngine::loop()
 		//Move the player
 		player->move();
 
-		std::cout<<player->toString()<<std::endl;
+		//std::cout<<player->toString()<<std::endl;
 		
 		//Clear screen
 		SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
@@ -291,21 +291,20 @@ bool GameEngine::loop()
 		
 		
 		for(int i=0;i<5;i++)
-		{
-			
-			switch (bullet[i].move( player->getRenderGuadFist() ))
-			{
-			case 0:
+		{	
+			int bulletMove=bullet[i].move( player->getRenderGuadFist());
+			if(bulletMove == 0){
 				bullet[i].render(gRenderer);
-				break;
-			case -1:
-				player->rockHitted(1);
-				score++;
-			case 1:
-			default:
-				bullet[i].reset();
+				continue;
 			}
+
+			else if(bulletMove  <0 ){
+				player->rockHitted(-bulletMove);
+				score+=6+bulletMove;
+			}	
+			bullet[i].reset();
 		}
+		
 	
 		
 		// switch (bullet->move( player->getRenderGuad() ))

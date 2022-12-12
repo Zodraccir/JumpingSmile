@@ -126,7 +126,7 @@ void Fist::move(int x,int y, SDL_RendererFlip type)
 	else
 		mPosX=mPosX+PLAYER_WIDTH/2+mAddedX;
 
-    std::cout<<std::to_string(mPosX)+"/"+std::to_string(mPosY)+"/"+std::to_string(mVelX)+"/"+std::to_string(mVelY)+"/"+std::to_string(mAddedX)+" :Fist"<<std::endl;
+    //std::cout<<std::to_string(mPosX)+"/"+std::to_string(mPosY)+"/"+std::to_string(mVelX)+"/"+std::to_string(mVelY)+"/"+std::to_string(mAddedX)+" :Fist"<<std::endl;
 	flipType=type;
 }
 
