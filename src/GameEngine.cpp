@@ -173,6 +173,12 @@ bool GameEngine::loadMedia()
 			printf( "Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
 			success = false;
 		}
+
+		if( bullet[i].setLoseSound(Mix_LoadWAV( "assets/lose.wav" )) == NULL )
+		{
+			printf( "Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
+			success = false;
+		}
 	}
 
 	// //Load dot texture
@@ -292,7 +298,7 @@ bool GameEngine::loop()
 		
 		for(int i=0;i<5;i++)
 		{	
-			int bulletMove=bullet[i].move( player->getRenderGuadFist());
+			int bulletMove=bullet[i].move(player->getRenderGuad() ,player->getRenderGuadFist() );
 			if(bulletMove == 0){
 				bullet[i].render(gRenderer);
 				continue;
@@ -301,7 +307,10 @@ bool GameEngine::loop()
 			else if(bulletMove  <0 ){
 				player->rockHitted(-bulletMove);
 				score+=6+bulletMove;
-			}	
+			}
+			else if (bulletMove == 10){
+				quit=true;
+			}
 			bullet[i].reset();
 		}
 		

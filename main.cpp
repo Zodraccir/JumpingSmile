@@ -25,6 +25,8 @@ int main( int argc, char* args[] )
 			
 			if(gameEngine.landingPage())
 						gameEngine.loop();
+
+			gameEngine.landingPage();
 		}
 	}
 

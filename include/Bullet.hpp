@@ -32,7 +32,7 @@ class Bullet
         void handleEvent( SDL_Event& e );
 
         //Moves the dot and checks collision
-        int move( SDL_Rect* square);
+        int move( SDL_Rect* player, SDL_Rect* fist);
 
         //Loads image at specified path
         bool loadFromFile( std::string path , SDL_Renderer* gRenderer);
@@ -45,6 +45,9 @@ class Bullet
 
         bool setCrashSound(Mix_Chunk* sound);
 		Mix_Chunk* getCrashSound();
+
+        bool setLoseSound(Mix_Chunk* sound);
+		Mix_Chunk* getLoseSound();        
 
         bool reset();
 
@@ -74,6 +77,8 @@ class Bullet
         int typeBullet;
 
         int dotWidht;
+
+        Mix_Chunk *loseSound;
 };
 
 

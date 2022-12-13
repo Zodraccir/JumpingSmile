@@ -54,7 +54,7 @@ bool checkCollision( Circle& a, SDL_Rect* b )
 
 bool checkCollision( Circle& a, Circle& b )
 {
-	//Calculate total radius squared
+	//Calculate total radius squaared
 	int totalRadiusSquared = a.r + b.r;
 	totalRadiusSquared = totalRadiusSquared * totalRadiusSquared;
 
@@ -91,6 +91,7 @@ Bullet::Bullet()
 {
     reset();
     crashSound=NULL;
+    loseSound=NULL;
 
 }
 
@@ -147,7 +148,7 @@ void Bullet::free()
 }
 
 
-int Bullet::move( SDL_Rect* square)
+int Bullet::move(  SDL_Rect* squarePlayer , SDL_Rect* squareFist)
 {
     //Move the dot left or right
     mPosX += mVelX;
@@ -162,11 +163,18 @@ int Bullet::move( SDL_Rect* square)
         return 1;
     }
     
-    //If the dot collided with the square
-    if( checkCollision( mCollider, square ) )
+    //If the dot collided with the squareFist
+    if( checkCollision( mCollider, squareFist ) )
     {
         Mix_PlayChannel( -1, crashSound, 0 );
         return -typeBullet;
+    }
+
+    //If the dot collided with the squarePlayer
+    if( checkCollision( mCollider, squarePlayer ) )
+    {
+        Mix_PlayChannel( -1, loseSound, 0 );
+        return 10;
     }
 
     return 0;
@@ -176,7 +184,7 @@ int Bullet::move( SDL_Rect* square)
 	shiftColliders();
 
     //If the dot collided or went too far up or down
-    if( ( mPosY - mCollider.r < 0 ) || ( mPosY + mCollider.r > SCREEN_HEIGHT ) || checkCollision( mCollider, square )  )
+    if( ( mPosY - mCollider.r < 0 ) || ( mPosY + mCollider.r > SCREEN_HEIGHT ) || checkCollision( mCollider, squareFist )  )
     {
         //Move back
         mPosY -= mVelY;
@@ -252,6 +260,16 @@ bool Bullet::setCrashSound(Mix_Chunk* sound)
 {	
 	crashSound = sound;
 	if(crashSound == NULL)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool Bullet::setLoseSound(Mix_Chunk* sound)
+{	
+	loseSound = sound;
+	if(loseSound == NULL)
 	{
 		return false;
 	}
